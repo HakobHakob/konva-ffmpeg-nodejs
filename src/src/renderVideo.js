@@ -1,33 +1,28 @@
-//node src/renderVideo.js
-const { url } = require("inspector")
-const Konva = require("konva")
-// const { URL } = require("url")
-// let myUrl = new URL(
-//   "https://images.srkh.in/wp-content/uploads/2020/10/Navratri-Logo.jpg"
-// )
+// const { default: Konva } = require("konva");
+const Konva = require("konva");
 
-const { videoWidth, videoHeight, videoFps } = require("./consts.js")
+const { videoWidth, videoHeight, videoFps } = require("./consts");
 const {
   saveFrame,
   createVideo,
   loadImageAsset,
   makeAnimation,
   combineAnimations,
-} = require("./videoUtils")
+} = require("./video.utils");
 
-const renderBackground = (layer) => {
+function renderBackground(layer) {
   layer.add(
     new Konva.Rect({
       x: 0,
       y: 0,
       width: videoWidth,
-      height: videoHeight,
-      fill: "transparent",
+      height: videoWidth,
+      fill: "#FCFCFC",
     })
-  )
+  );
 }
 
-const renderText = (layer) => {
+function renderText(layer) {
   const hello = new Konva.Text({
     align: "center",
     x: -videoWidth,
@@ -35,10 +30,9 @@ const renderText = (layer) => {
     y: 150,
     fontSize: 200,
     fontStyle: "bold",
-    text: "Hello",
     fill: "#1E3740",
-  })
-
+    text: "Hello",
+  });
   const from = new Konva.Text({
     align: "center",
     x: videoWidth,
@@ -47,8 +41,7 @@ const renderText = (layer) => {
     fontSize: 150,
     fill: "#1E3740",
     text: "from",
-  })
-
+  });
   const konva = new Konva.Text({
     align: "center",
     x: 0,
@@ -58,10 +51,10 @@ const renderText = (layer) => {
     fontStyle: "bold",
     fill: "#129A74",
     text: "Konva",
-    opacity: 0.2,
-  })
+    opacity: 0,
+  });
 
-  layer.add(hello, from, konva)
+  layer.add(hello, from, konva);
 
   return combineAnimations(
     makeAnimation((d) => hello.x((d - 1) * videoWidth), {
@@ -76,70 +69,66 @@ const renderText = (layer) => {
       startFrame: 2.5 * videoFps,
       duration: 1 * videoFps,
     })
-  )
+  );
 }
 
-const renderLogo = async (layer, image) => {
-  // const image = await loadImageAsset("../assets/logo.jpg")
-  // const aspect = image.width() / image.height()
+async function renderLogo(layer) {
+  const image = await loadImageAsset("leanylabs.png");
+  const aspect = image.width() / image.height();
+  image.width(aspect * 100);
+  image.height(100);
+  image.y(videoHeight - 100 - 50);
+  image.x(videoWidth - image.width() - 75);
+  image.cache();
+  image.opacity(0);
 
-  image.width(videoHeight)
-  image.height(videoWidth)
-  image.y(0)
-  image.x(0)
-  image.cache()
-  image.opacity(0.1)
-
-  layer.add(image)
+  layer.add(image);
 
   return makeAnimation((d) => image.opacity(d), {
-    startFrame: 5 * videoFps,
+    startFrame: 3 * videoFps,
     duration: 1 * videoFps,
-  })
+  });
 }
 
-const renderVideo = async ({ outputDir, output }) => {
+async function renderVideo({ outputDir, output }) {
   const stage = new Konva.Stage({
     width: videoWidth,
     height: videoHeight,
-  })
+  });
   const start = Date.now()
   const frames = 5 * videoFps
-
   try {
     const layer = new Konva.Layer()
-
     stage.add(layer)
-    const image = await loadImageAsset("../assets/logo.jpg")
 
     const animate = combineAnimations(
       renderBackground(layer),
       renderText(layer),
-      renderLogo(layer, image)
-    )
+      await renderLogo(layer)
+    );
 
-    console.log("generating frames...")
+    console.log("generating frames...");
     for (let frame = 0; frame < frames; ++frame) {
-      animate(frame)
+      animate(frame);
 
-      layer.draw()
+      layer.draw();
 
-      await saveFrame({ stage, outputDir, frame })
+      await saveFrame({ stage, outputDir, frame });
 
       if ((frame + 1) % videoFps === 0) {
-        console.log(`rendered ${(frame + 1) / videoFps} second(s)`)
+        console.log(`rendered ${(frame + 1) / videoFps} second(s)`);
       }
     }
   } finally {
-    stage.destroy()
+    stage.destroy();
   }
 
-  console.log("creating video")
-  createVideo({ fps: videoFps, outputDir, output })
-  const time = Date.now() - start
-  console.log(`done in ${time} ms. ${(frames * 1000) / (time || 0.01)} FPS`)
+  console.log("creating video");
+  await createVideo({ fps: videoFps, outputDir, output });
+  const time = Date.now() - start;
+  console.log(`done in ${time} ms. ${(frames * 1000) / (time || 0.01)} FPS`);
 }
 
 module.exports = {
   renderVideo,
-}
+};
