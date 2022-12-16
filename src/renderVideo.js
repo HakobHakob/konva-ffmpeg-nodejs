@@ -22,7 +22,7 @@ const renderBackground = (layer) => {
       y: 0,
       width: videoWidth,
       height: videoHeight,
-      fill: "transparent",
+      fill: "white",
     })
   )
 }
@@ -64,7 +64,9 @@ const renderText = (layer) => {
   layer.add(hello, from, konva)
 
   return combineAnimations(
-    makeAnimation((d) => hello.x((d - 1) * videoWidth), {
+    makeAnimation((d) =>
+  
+    hello.x((d - 1) * videoWidth), {
       startFrame: 0,
       duration: 2 * videoFps,
     }),
@@ -130,6 +132,8 @@ const renderVideo = async ({ outputDir, output }) => {
         console.log(`rendered ${(frame + 1) / videoFps} second(s)`)
       }
     }
+
+    
   } finally {
     stage.destroy()
   }

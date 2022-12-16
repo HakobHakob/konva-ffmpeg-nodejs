@@ -57,7 +57,9 @@ function renderText(layer) {
   layer.add(hello, from, konva);
 
   return combineAnimations(
-    makeAnimation((d) => hello.x((d - 1) * videoWidth), {
+    makeAnimation((d) =>
+   
+    hello.x((d - 1) * videoWidth), {
       startFrame: 0,
       duration: 2 * videoFps,
     }),

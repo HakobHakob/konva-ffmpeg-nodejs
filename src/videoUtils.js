@@ -16,7 +16,7 @@ const loadImageAsset = (filename) => {
   return loadKonvaImage(path.join(__dirname, "../assets", filename))
 }
 
-function makeAnimation(callback, { startFrame, duration }) {
+function makeAnimation(callback, { startFrame, duration }) {   
   return (frame) => {
     const thisFrame = frame - startFrame
     if (thisFrame > 0 && thisFrame <= duration) {
