@@ -1,11 +1,5 @@
-//node src/renderVideo.js
 const { url } = require("inspector")
 const Konva = require("konva")
-// const { URL } = require("url")
-// let myUrl = new URL(
-//   "https://images.srkh.in/wp-content/uploads/2020/10/Navratri-Logo.jpg"
-// )
-
 const { videoWidth, videoHeight, videoFps } = require("./consts.js")
 const {
   saveFrame,
@@ -82,16 +76,12 @@ const renderText = (layer) => {
 }
 
 const renderLogo = async (layer, image) => {
-  // const image = await loadImageAsset("../assets/logo.jpg")
-  // const aspect = image.width() / image.height()
-
   image.width(videoHeight)
   image.height(videoWidth)
   image.y(0)
   image.x(0)
   image.cache()
   image.opacity(0.1)
-
   layer.add(image)
 
   return makeAnimation((d) => image.opacity(d), {
@@ -110,10 +100,8 @@ const renderVideo = async ({ outputDir, output }) => {
 
   try {
     const layer = new Konva.Layer()
-
     stage.add(layer)
     const image = await loadImageAsset("../assets/logo.jpg")
-
     const animate = combineAnimations(
       renderBackground(layer),
       renderText(layer),
@@ -123,16 +111,12 @@ const renderVideo = async ({ outputDir, output }) => {
     console.log("generating frames...")
     for (let frame = 0; frame < frames; ++frame) {
       animate(frame)
-
       layer.draw()
-
       await saveFrame({ stage, outputDir, frame })
-
       if ((frame + 1) % videoFps === 0) {
         console.log(`rendered ${(frame + 1) / videoFps} second(s)`)
       }
     }
-
     
   } finally {
     stage.destroy()
