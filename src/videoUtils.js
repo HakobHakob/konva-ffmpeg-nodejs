@@ -3,15 +3,12 @@ const fs = require("fs")
 const path = require("path")
 const execa = require("execa")
 const Konva = require("konva")
-
 const frameLength = 6
-
 const loadKonvaImage = (url) => {
   return new Promise((res) => {
     Konva.Image.fromURL(url, res)
   })
 }
-
 const loadImageAsset = (filename) => {
   return loadKonvaImage(path.join(__dirname, "../assets", filename))
 }
